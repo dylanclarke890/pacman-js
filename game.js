@@ -13,6 +13,7 @@ const settings = {
   fps: FPS,
   fpsInterval: 1000 / FPS,
   cellSize: 40,
+  pacmanR: 10,
 };
 
 class Boundary {
@@ -27,6 +28,25 @@ class Boundary {
     ctx.fillStyle = "blue";
     ctx.fillRect(this.x, this.y, this.w, this.h);
   }
+}
+
+class Player {
+  constructor(x, y, velocity) {
+    this.x = x;
+    this.y = y;
+    this.velocity = velocity;
+    this.r = settings.pacmanR;
+  }
+
+  draw() {
+    ctx.fillStyle = "yellow";
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  update() {}
 }
 
 const map = [
@@ -45,6 +65,11 @@ const map = [
 ];
 
 const boundaries = [];
+const player = new Player(
+  settings.cellSize + settings.cellSize / 2,
+  settings.cellSize + settings.cellSize / 2,
+  { x: 0, y: 0 }
+);
 
 (function setUpMap() {
   const { cellSize } = settings;
@@ -61,16 +86,17 @@ const boundaries = [];
   });
 })();
 
-let stop = false,
-  now,
-  lastFrame;
-
 function update() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (let i = 0; i < boundaries.length; i++) {
     boundaries[i].draw();
   }
+  player.draw();
 }
+
+let stop = false,
+  now,
+  lastFrame;
 
 (function startAnimating() {
   lastFrame = window.performance.now();
