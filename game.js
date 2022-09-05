@@ -96,6 +96,18 @@ class Player {
     if (pressed.left) this.x -= this.velocity.x;
     if (pressed.down) this.y += this.velocity.y;
     if (pressed.up) this.y -= this.velocity.y;
+
+    for (let i = 0; i < boundaries.length; i++) {
+      const bound = boundaries[i];
+      if (
+        this.y - this.r <= bound.y + bound.h &&
+        this.x + this.r >= bound.x &&
+        this.y + this.r >= bound.y &&
+        this.x - this.r <= bound.x + bound.w
+      ) {
+        console.log("collision");
+      }
+    }
   }
 }
 
