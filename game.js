@@ -14,12 +14,28 @@ const settings = {
   fpsInterval: 1000 / FPS,
 };
 
+class Boundary {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.w = 40;
+    this.h = 40;
+  }
+
+  draw() {
+    ctx.fillStyle = "blue";
+    ctx.fillRect(this.x, this.y, this.w, this.h);
+  }
+}
+
 let stop = false,
   now,
   lastFrame;
 
+const boundary = new Boundary(100, 100);
 function update() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  boundary.draw();
 }
 
 (function startAnimating() {
