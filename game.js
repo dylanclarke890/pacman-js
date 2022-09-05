@@ -6,7 +6,7 @@ function new2dCanvas(id, width, height) {
   return [canvas, ctx];
 }
 
-const [canvas, ctx] = new2dCanvas("play-area", 800, 500);
+const [canvas, ctx] = new2dCanvas("play-area", 800, 480);
 
 const pressed = {
   up: { key: "ArrowUp", is: false },
@@ -61,6 +61,7 @@ const settings = {
   fpsInterval: 1000 / FPS,
   cellSize: 40,
   pacmanR: 15,
+  pacmanSpeed: 3,
 };
 
 class Boundary {
@@ -78,10 +79,11 @@ class Boundary {
 }
 
 class Player {
-  constructor(x, y, velocity) {
+  static speed = settings.pacmanSpeed;
+  constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.velocity = velocity;
+    this.velocity = { x: 0, y: 0 };
     this.r = settings.pacmanR;
   }
 
@@ -96,16 +98,20 @@ class Player {
   update() {
     switch (pressed.last) {
       case pressed.right.key:
-        this.x += this.velocity.x;
+        this.velocity.x = Player.speed;
+        this.velocity.y = 0;
         break;
       case pressed.left.key:
-        this.x -= this.velocity.x;
+        this.velocity.x = -Player.speed;
+        this.velocity.y = 0;
         break;
       case pressed.down.key:
-        this.y += this.velocity.y;
+        this.velocity.x = 0;
+        this.velocity.y = Player.speed;
         break;
       case pressed.up.key:
-        this.y -= this.velocity.y;
+        this.velocity.x = 0;
+        this.velocity.y = -Player.speed;
         break;
       default:
         break;
@@ -119,8 +125,20 @@ class Player {
         this.y + this.r >= bound.y &&
         this.x - this.r <= bound.x + bound.w
       ) {
+        if (this.velocity.x > 0) this.x -= Player.speed;
+        else if (this.velocity.x < 0) this.x += Player.speed;
+        if (this.velocity.y > 0) this.y -= Player.speed;
+        else if (this.velocity.y < 0) this.y += Player.speed;
+
+        this.velocity.x = 0;
+        this.velocity.y = 0;
+        pressed.last = "";
+        break;
       }
     }
+
+    this.x += this.velocity.x;
+    this.y += this.velocity.y;
   }
 }
 
@@ -143,7 +161,7 @@ const boundaries = [];
 const player = new Player(
   settings.cellSize + settings.cellSize / 2,
   settings.cellSize + settings.cellSize / 2,
-  { x: 5, y: 5 }
+  { x: 0, y: 0 }
 );
 
 (function setUpMap() {
