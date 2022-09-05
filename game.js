@@ -8,6 +8,51 @@ function new2dCanvas(id, width, height) {
 
 const [canvas, ctx] = new2dCanvas("play-area", 800, 500);
 
+const pressed = {
+  up: false,
+  down: false,
+  left: false,
+  right: false,
+};
+
+window.addEventListener("keydown", (e) => {
+  switch (e.code) {
+    case "ArrowUp":
+      pressed.up = true;
+      break;
+    case "ArrowDown":
+      pressed.down = true;
+      break;
+    case "ArrowRight":
+      pressed.right = true;
+      break;
+    case "ArrowLeft":
+      pressed.left = true;
+      break;
+    default:
+      break;
+  }
+});
+
+window.addEventListener("keyup", (e) => {
+  switch (e.code) {
+    case "ArrowUp":
+      pressed.up = false;
+      break;
+    case "ArrowDown":
+      pressed.down = false;
+      break;
+    case "ArrowRight":
+      pressed.right = false;
+      break;
+    case "ArrowLeft":
+      pressed.left = false;
+      break;
+    default:
+      break;
+  }
+});
+
 const FPS = 60;
 const settings = {
   fps: FPS,
@@ -47,8 +92,10 @@ class Player {
   }
 
   update() {
-    this.x += this.velocity.x;
-    this.y += this.velocity.y;
+    if (pressed.right) this.x += this.velocity.x;
+    if (pressed.left) this.x -= this.velocity.x;
+    if (pressed.down) this.y += this.velocity.y;
+    if (pressed.up) this.y -= this.velocity.y;
   }
 }
 
@@ -71,31 +118,8 @@ const boundaries = [];
 const player = new Player(
   settings.cellSize + settings.cellSize / 2,
   settings.cellSize + settings.cellSize / 2,
-  { x: 0, y: 0 }
+  { x: 5, y: 5 }
 );
-
-window.addEventListener("keydown", (e) => {
-  switch (e.code) {
-    case "ArrowUp":
-      player.velocity.y = -5;
-      player.velocity.x = 0;
-      break;
-    case "ArrowDown":
-      player.velocity.y = 5;
-      player.velocity.x = 0;
-      break;
-    case "ArrowRight":
-      player.velocity.x = 5;
-      player.velocity.y = 0;
-      break;
-    case "ArrowLeft":
-      player.velocity.x = -5;
-      player.velocity.y = 0;
-      break;
-    default:
-      break;
-  }
-});
 
 (function setUpMap() {
   const { cellSize } = settings;
