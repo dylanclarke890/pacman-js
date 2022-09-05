@@ -12,14 +12,15 @@ const FPS = 60;
 const settings = {
   fps: FPS,
   fpsInterval: 1000 / FPS,
+  cellSize: 40,
 };
 
 class Boundary {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.w = 40;
-    this.h = 40;
+    this.w = settings.cellSize;
+    this.h = settings.cellSize;
   }
 
   draw() {
@@ -28,14 +29,47 @@ class Boundary {
   }
 }
 
+const map = [
+  ["-", "-", "-", "-", "-", "-"],
+  ["-", " ", " ", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", "-"],
+  ["-", " ", "-", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", "-"],
+  ["-", "-", "-", "-", "-", "-"],
+];
+
+const boundaries = [];
+
+(function setUpMap() {
+  const { cellSize } = settings;
+  map.forEach((row, i) => {
+    row.forEach((cell, j) => {
+      switch (cell) {
+        case "-":
+          boundaries.push(new Boundary(j * cellSize, i * cellSize));
+          break;
+        default:
+          break;
+      }
+    });
+  });
+})();
+
 let stop = false,
   now,
   lastFrame;
 
-const boundary = new Boundary(100, 100);
 function update() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  boundary.draw();
+  for (let i = 0; i < boundaries.length; i++) {
+    boundaries[i].draw();
+  }
 }
 
 (function startAnimating() {
