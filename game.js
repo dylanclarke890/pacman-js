@@ -13,7 +13,7 @@ const settings = {
   fps: FPS,
   fpsInterval: 1000 / FPS,
   cellSize: 40,
-  pacmanR: 10,
+  pacmanR: 15,
 };
 
 class Boundary {
@@ -46,7 +46,10 @@ class Player {
     ctx.closePath();
   }
 
-  update() {}
+  update() {
+    this.x += this.velocity.x;
+    this.y += this.velocity.y;
+  }
 }
 
 const map = [
@@ -71,6 +74,29 @@ const player = new Player(
   { x: 0, y: 0 }
 );
 
+window.addEventListener("keydown", (e) => {
+  switch (e.code) {
+    case "ArrowUp":
+      player.velocity.y = -5;
+      player.velocity.x = 0;
+      break;
+    case "ArrowDown":
+      player.velocity.y = 5;
+      player.velocity.x = 0;
+      break;
+    case "ArrowRight":
+      player.velocity.x = 5;
+      player.velocity.y = 0;
+      break;
+    case "ArrowLeft":
+      player.velocity.x = -5;
+      player.velocity.y = 0;
+      break;
+    default:
+      break;
+  }
+});
+
 (function setUpMap() {
   const { cellSize } = settings;
   map.forEach((row, i) => {
@@ -92,6 +118,7 @@ function update() {
     boundaries[i].draw();
   }
   player.draw();
+  player.update();
 }
 
 let stop = false,
