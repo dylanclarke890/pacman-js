@@ -9,44 +9,46 @@ function new2dCanvas(id, width, height) {
 const [canvas, ctx] = new2dCanvas("play-area", 800, 500);
 
 const pressed = {
-  up: false,
-  down: false,
-  left: false,
-  right: false,
+  up: { key: "ArrowUp", is: false },
+  down: { key: "ArrowDown", is: false },
+  left: { key: "ArrowLeft", is: false },
+  right: { key: "ArrowRight", is: false },
+  last: "",
 };
 
 window.addEventListener("keydown", (e) => {
   switch (e.code) {
     case "ArrowUp":
-      pressed.up = true;
+      pressed.up.is = true;
       break;
     case "ArrowDown":
-      pressed.down = true;
+      pressed.down.is = true;
       break;
     case "ArrowRight":
-      pressed.right = true;
+      pressed.right.is = true;
       break;
     case "ArrowLeft":
-      pressed.left = true;
+      pressed.left.is = true;
       break;
     default:
       break;
   }
+  pressed.last = e.code;
 });
 
 window.addEventListener("keyup", (e) => {
   switch (e.code) {
     case "ArrowUp":
-      pressed.up = false;
+      pressed.up.is = false;
       break;
     case "ArrowDown":
-      pressed.down = false;
+      pressed.down.is = false;
       break;
     case "ArrowRight":
-      pressed.right = false;
+      pressed.right.is = false;
       break;
     case "ArrowLeft":
-      pressed.left = false;
+      pressed.left.is = false;
       break;
     default:
       break;
@@ -92,10 +94,22 @@ class Player {
   }
 
   update() {
-    if (pressed.right) this.x += this.velocity.x;
-    if (pressed.left) this.x -= this.velocity.x;
-    if (pressed.down) this.y += this.velocity.y;
-    if (pressed.up) this.y -= this.velocity.y;
+    switch (pressed.last) {
+      case pressed.right.key:
+        this.x += this.velocity.x;
+        break;
+      case pressed.left.key:
+        this.x -= this.velocity.x;
+        break;
+      case pressed.down.key:
+        this.y += this.velocity.y;
+        break;
+      case pressed.up.key:
+        this.y -= this.velocity.y;
+        break;
+      default:
+        break;
+    }
 
     for (let i = 0; i < boundaries.length; i++) {
       const bound = boundaries[i];
@@ -105,7 +119,6 @@ class Player {
         this.y + this.r >= bound.y &&
         this.x - this.r <= bound.x + bound.w
       ) {
-        console.log("collision");
       }
     }
   }
