@@ -22,7 +22,7 @@ const settings = {
   fpsInterval: 1000 / FPS,
   cellSize: 40,
   pacmanR: 15,
-  pacmanSpeed: 3,
+  pacmanSpeed: 4,
   ghostR: 15,
   ghostSpeed: 2,
   pelletR: 3,
