@@ -5,7 +5,6 @@ body {
 }
 
 #play-area {
-  border: 1px solid lightblue;
   width: 440;
   height: 560px;
   background: black;

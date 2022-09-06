@@ -25,16 +25,16 @@ const settings = {
   pacmanSpeed: 3,
   pelletR: 3,
   pelletPoints: 10,
-  borderOffset: 3,
+  offset: 3,
   topbarOffset: 40,
 };
 
 function isCircleRectCollision(c, r) {
   return (
-    c.y - c.r + c.velocity.y - settings.borderOffset <= r.y + r.h &&
-    c.x + c.r + c.velocity.x + settings.borderOffset >= r.x &&
-    c.y + c.r + c.velocity.y + settings.borderOffset >= r.y &&
-    c.x - c.r + c.velocity.x - settings.borderOffset <= r.x + r.w
+    c.y - c.r + c.velocity.y - settings.offset <= r.y + r.h &&
+    c.x + c.r + c.velocity.x + settings.offset >= r.x &&
+    c.y + c.r + c.velocity.y + settings.offset >= r.y &&
+    c.x - c.r + c.velocity.x - settings.offset <= r.x + r.w
   );
 }
 
