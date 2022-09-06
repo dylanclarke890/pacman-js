@@ -24,7 +24,7 @@ const settings = {
   pacmanR: 15,
   pacmanSpeed: 3,
   ghostR: 15,
-  ghostSpeed: 3,
+  ghostSpeed: 2,
   pelletR: 3,
   pelletPoints: 10,
   offset: 3,
@@ -179,9 +179,10 @@ class Ghost {
   constructor(x, y, color) {
     this.x = x;
     this.y = y;
-    this.velocity = { x: 0, y: 0 };
+    this.velocity = { x: settings.ghostSpeed, y: 0 };
     this.r = settings.ghostR;
     this.color = color;
+    this.prevCollisions = [];
   }
 
   draw() {
@@ -193,25 +194,81 @@ class Ghost {
   }
 
   update() {
-    if (this.willCollideWithABoundary(this.velocity.x, this.velocity.y)) {
-      this.velocity.x = 0;
-      this.velocity.y = 0;
+    const collisions = [];
+    for (let i = 0; i < boundaries.length; i++) {
+      if (
+        !collisions.includes("l") &&
+        isCircleRectCollision(
+          { ...this, velocity: { x: -Ghost.speed, y: 0 } },
+          boundaries[i]
+        )
+      )
+        collisions.push("l");
+      if (
+        !collisions.includes("r") &&
+        isCircleRectCollision(
+          { ...this, velocity: { x: Ghost.speed, y: 0 } },
+          boundaries[i]
+        )
+      )
+        collisions.push("r");
+      if (
+        !collisions.includes("u") &&
+        isCircleRectCollision(
+          { ...this, velocity: { x: 0, y: -Ghost.speed } },
+          boundaries[i]
+        )
+      )
+        collisions.push("u");
+      if (
+        !collisions.includes("d") &&
+        isCircleRectCollision(
+          { ...this, velocity: { x: 0, y: Ghost.speed } },
+          boundaries[i]
+        )
+      )
+        collisions.push("d");
+    }
+
+    if (collisions.length > this.prevCollisions.length)
+      this.prevCollisions = collisions;
+
+    if (JSON.stringify(collisions) !== JSON.stringify(this.prevCollisions)) {
+      if (this.velocity.x > 0) this.prevCollisions.push("r");
+      else if (this.velocity.x < 0) this.prevCollisions.push("l");
+      else if (this.velocity.y > 0) this.prevCollisions.push("d");
+      else if (this.velocity.y < 0) this.prevCollisions.push("u");
+
+      const pathways = this.prevCollisions.filter(
+        (c) => !collisions.includes(c)
+      );
+
+      const dir = pathways[Math.floor(Math.random() * pathways.length)];
+      switch (dir) {
+        case "u":
+          this.velocity.x = 0;
+          this.velocity.y = -Ghost.speed;
+          break;
+        case "d":
+          this.velocity.x = 0;
+          this.velocity.y = Ghost.speed;
+          break;
+        case "l":
+          this.velocity.x = -Ghost.speed;
+          this.velocity.y = 0;
+          break;
+        case "r":
+          this.velocity.x = Ghost.speed;
+          this.velocity.y = 0;
+          break;
+        default:
+          break;
+      }
+      this.prevCollisions = [];
     }
 
     this.x += this.velocity.x;
     this.y += this.velocity.y;
-  }
-
-  willCollideWithABoundary(xv, yv) {
-    for (let i = 0; i < boundaries.length; i++)
-      if (
-        isCircleRectCollision(
-          { ...this, velocity: { x: xv, y: yv } },
-          boundaries[i]
-        )
-      )
-        return true;
-    return false;
   }
 }
 
