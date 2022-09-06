@@ -6,7 +6,7 @@ function new2dCanvas(id, width, height) {
   return [canvas, ctx];
 }
 
-const [canvas, ctx] = new2dCanvas("play-area", 800, 520);
+const [canvas, ctx] = new2dCanvas("play-area", 440, 560);
 
 const pressed = {
   up: { key: "ArrowUp", is: false },
@@ -24,7 +24,9 @@ const settings = {
   pacmanR: 15,
   pacmanSpeed: 3,
   pelletR: 3,
+  pelletPoints: 10,
   borderOffset: 3,
+  topbarOffset: 40,
 };
 
 function isCircleRectCollision(c, r) {
@@ -209,9 +211,10 @@ const map = [
 
 const boundaries = [];
 let pellets = [];
+let score = 0;
 const player = new Player(
   settings.cellSize + settings.cellSize / 2,
-  settings.cellSize + settings.cellSize / 2,
+  settings.cellSize + settings.topbarOffset + settings.cellSize / 2,
   { x: 0, y: 0 }
 );
 
@@ -248,11 +251,11 @@ function newImage(src) {
 }
 
 (function setUpMap() {
-  const { cellSize } = settings;
+  const { cellSize, topbarOffset } = settings;
   map.forEach((row, i) => {
     row.forEach((cell, j) => {
       const x = j * cellSize,
-        y = i * cellSize;
+        y = i * cellSize + topbarOffset;
       switch (cell) {
         case "-":
           boundaries.push(new Boundary(x, y, newImage(assets.pipe.horizontal)));
@@ -333,7 +336,14 @@ function update() {
   }
   player.draw();
   player.update();
+  const origLength = pellets.length;
   pellets = pellets.filter((p) => !p.collected);
+  const pelletsRemoved = origLength - pellets.length;
+  score += pelletsRemoved * settings.pelletPoints;
+  ctx.font = "18px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "white";
+  ctx.fillText(`Score: ${score}`, canvas.width / 2, 25);
 }
 
 let stop = false,
