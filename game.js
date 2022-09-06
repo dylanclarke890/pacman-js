@@ -26,7 +26,7 @@ const settings = {
   ghostR: 15,
   ghostSpeed: 2,
   ghostPoints: 100,
-  ghostScaredColor: "purple",
+  ghostScaredColor: "blue",
   ghostScaredTime: 3, // in seconds
   pelletR: 3,
   pelletPoints: 10,
@@ -475,7 +475,7 @@ function newImage(src) {
           ghosts.push(new Ghost(x + cellSize / 2, y + cellSize / 2, "green"));
           break;
         case "B":
-          ghosts.push(new Ghost(x + cellSize / 2, y + cellSize / 2, "blue"));
+          ghosts.push(new Ghost(x + cellSize / 2, y + cellSize / 2, "pink"));
           break;
         default:
           break;
