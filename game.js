@@ -524,7 +524,7 @@ function handleGameLoop() {
     }
   }
 
-  if (powerups.length === 0 && pellets.length === 0) winState = 1;
+  if (pellets.length === 0) winState = 1;
 }
 
 function handleGameOver() {
