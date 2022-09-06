@@ -36,6 +36,10 @@ function isCircleRectCollision(c, r) {
   );
 }
 
+function circlesAreColliding(c1, c2) {
+  return Math.hypot(c1.x - c2.x, c1.y - c2.y) < c1.r + c2.r;
+}
+
 window.addEventListener("keydown", (e) => {
   switch (e.code) {
     case "ArrowUp":
@@ -107,7 +111,6 @@ class Player {
   }
 
   update() {
-    console.log({ x: this.x });
     switch (pressed.last) {
       case pressed.right.key:
         if (this.willCollideWithABoundary(Player.speed, 0)) {
@@ -172,6 +175,7 @@ class Pellet {
     this.x = x;
     this.y = y;
     this.r = settings.pelletR;
+    this.collected = false;
   }
 
   draw() {
@@ -180,6 +184,10 @@ class Pellet {
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
     ctx.fill();
     ctx.closePath();
+  }
+
+  update() {
+    if (circlesAreColliding(this, player)) this.collected = true;
   }
 }
 
@@ -200,7 +208,7 @@ const map = [
 ];
 
 const boundaries = [];
-const pellets = [];
+let pellets = [];
 const player = new Player(
   settings.cellSize + settings.cellSize / 2,
   settings.cellSize + settings.cellSize / 2,
@@ -321,9 +329,11 @@ function update() {
   }
   for (let i = 0; i < pellets.length; i++) {
     pellets[i].draw();
+    pellets[i].update();
   }
   player.draw();
   player.update();
+  pellets = pellets.filter((p) => !p.collected);
 }
 
 let stop = false,
