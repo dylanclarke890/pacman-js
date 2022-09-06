@@ -115,6 +115,13 @@ class Player {
   }
 
   update() {
+    for (let i = 0; i < ghosts.length; i++) {
+      if (circlesAreColliding(this, ghosts[i])) {
+        winState = -1;
+        return;
+      }
+    }
+
     switch (pressed.last) {
       case pressed.right.key:
         if (this.willCollideWithABoundary(Player.speed, 0)) {
@@ -313,6 +320,7 @@ let boundaries = [];
 let pellets = [];
 let ghosts = [];
 let score = 0;
+let winState = 0;
 let player;
 
 const assets = {
@@ -434,8 +442,7 @@ function newImage(src) {
   });
 })();
 
-function update() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+function handleGameLoop() {
   for (let i = 0; i < boundaries.length; i++) {
     boundaries[i].draw();
   }
@@ -453,6 +460,33 @@ function update() {
   pellets = pellets.filter((p) => !p.collected);
   const pelletsRemoved = origLength - pellets.length;
   score += pelletsRemoved * settings.pelletPoints;
+}
+
+function handleGameOver() {
+  ctx.font = "30px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "white";
+  ctx.fillText(`GAME OVER`, canvas.width / 2, canvas.width / 2);
+}
+
+function handleGameWin() {}
+
+function update() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  switch (winState) {
+    case 1:
+      handleGameWin();
+      break;
+    case 0:
+      handleGameLoop();
+      break;
+    case -1:
+      handleGameOver();
+      break;
+    default:
+      break;
+  }
   ctx.font = "18px sans-serif";
   ctx.textAlign = "center";
   ctx.fillStyle = "white";
