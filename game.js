@@ -75,16 +75,16 @@ window.addEventListener("keyup", (e) => {
 });
 
 class Boundary {
-  constructor(x, y) {
+  constructor(x, y, image) {
     this.x = x;
     this.y = y;
     this.w = settings.cellSize;
     this.h = settings.cellSize;
+    this.image = image;
   }
 
   draw() {
-    ctx.fillStyle = "blue";
-    ctx.fillRect(this.x, this.y, this.w, this.h);
+    ctx.drawImage(this.image, this.x, this.y);
   }
 }
 
@@ -168,16 +168,16 @@ class Player {
 
 const map = [
   ["-", "-", "-", "-", "-", "-", "-"],
-  ["-", " ", " ", " ", " ", " ", "-"],
-  ["-", " ", "-", " ", "-", " ", "-"],
-  ["-", " ", " ", " ", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", " ", "-"],
-  ["-", " ", "-", " ", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", " ", "-"],
+  ["|", " ", " ", " ", " ", " ", "|"],
+  ["|", " ", "-", " ", "-", " ", "|"],
+  ["|", " ", " ", " ", " ", " ", "|"],
+  ["|", " ", " ", " ", " ", " ", "|"],
+  ["|", " ", "-", " ", " ", " ", "|"],
+  ["|", " ", " ", " ", " ", " ", "|"],
+  ["|", " ", " ", " ", " ", " ", "|"],
+  ["|", " ", " ", " ", " ", " ", "|"],
+  ["|", " ", " ", " ", " ", " ", "|"],
+  ["|", " ", " ", " ", " ", " ", "|"],
   ["-", "-", "-", "-", "-", "-", "-"],
 ];
 
@@ -188,13 +188,50 @@ const player = new Player(
   { x: 0, y: 0 }
 );
 
+const assets = {
+  block: "./assets/block.png",
+  cap: {
+    top: "./assets/capTop.png",
+    right: "./assets/capRight.png",
+    left: "./assets/capLeft.png",
+    bottom: "./assets/capBottom.png",
+  },
+  pipe: {
+    horizontal: "./assets/pipeHorizontal.png",
+    vertical: "./assets/pipeVertical.png",
+    cross: "./assets/pipeCross.png",
+    bottomRight: "./assets/pipeCornerBR.png",
+    bottomLeft: "./assets/pipeCornerBL.png",
+    topRight: "./assets/pipeCornerTR.png",
+    topLeft: "./assets/pipeCornerTL.png",
+  },
+  pipeConnector: {
+    top: "./assets/pipeConnectorTop.png",
+    right: "./assets/pipeConnectorRight.png",
+    left: "./assets/pipeConnectorLeft.png",
+    bottom: "./assets/pipeConnectorBottom.png",
+    downwards: "./assets/pipeConnectorDownwards.png",
+  },
+};
+
+function newImage(src) {
+  const img = new Image();
+  img.src = src;
+  return img;
+}
+
 (function setUpMap() {
   const { cellSize } = settings;
   map.forEach((row, i) => {
     row.forEach((cell, j) => {
+      const x = j * cellSize,
+        y = i * cellSize;
       switch (cell) {
         case "-":
-          boundaries.push(new Boundary(j * cellSize, i * cellSize));
+          boundaries.push(new Boundary(x, y, newImage(assets.pipe.horizontal)));
+          break;
+        case "|":
+          boundaries.push(new Boundary(x, y, newImage(assets.pipe.vertical)));
           break;
         default:
           break;
