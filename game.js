@@ -25,9 +25,13 @@ const settings = {
   pacmanSpeed: 4,
   ghostR: 15,
   ghostSpeed: 2,
+  ghostPoints: 100,
+  ghostScaredColor: "purple",
+  ghostScaredTime: 3, // in seconds
   pelletR: 3,
   pelletPoints: 10,
   powerupR: 5,
+  powerupPoints: 50,
   offset: 3,
   topbarOffset: 40,
 };
@@ -117,9 +121,14 @@ class Player {
 
   update() {
     for (let i = 0; i < ghosts.length; i++) {
-      if (circlesAreColliding(this, ghosts[i])) {
-        winState = -1;
-        return;
+      const ghost = ghosts[i];
+      if (circlesAreColliding(this, ghost)) {
+        if (ghost.scaredTimer > 0) {
+          ghost.eaten = true;
+        } else {
+          winState = -1;
+          return;
+        }
       }
     }
 
@@ -184,6 +193,7 @@ class Player {
 
 class Ghost {
   static speed = settings.ghostSpeed;
+  static scaredColor = settings.ghostScaredColor;
   constructor(x, y, color) {
     this.x = x;
     this.y = y;
@@ -191,10 +201,12 @@ class Ghost {
     this.r = settings.ghostR;
     this.color = color;
     this.prevCollisions = [];
+    this.scaredTimer = 0;
+    this.eaten = false;
   }
 
   draw() {
-    ctx.fillStyle = this.color;
+    ctx.fillStyle = this.scaredTimer > 0 ? Ghost.scaredColor : this.color;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
     ctx.fill();
@@ -202,6 +214,10 @@ class Ghost {
   }
 
   update() {
+    if (this.scaredTimer > 0) {
+      this.scaredTimer--;
+    }
+
     const collisions = [];
     for (let i = 0; i < boundaries.length; i++) {
       if (
@@ -486,15 +502,27 @@ function handleGameLoop() {
   }
   player.draw();
   player.update();
+
   const oP = pellets.length;
+  const oG = ghosts.length;
   const oPU = powerups.length;
+
   pellets = pellets.filter((p) => !p.collected);
   powerups = powerups.filter((p) => !p.collected);
+  ghosts = ghosts.filter((p) => !p.eaten);
 
   const pelletsRemoved = oP - pellets.length;
   const powerupsRemoved = oPU - powerups.length;
+  const ghostsRemoved = oG - ghosts.length;
   score += pelletsRemoved * settings.pelletPoints;
   score += powerupsRemoved * settings.powerupPoints;
+  score += ghostsRemoved * settings.ghostPoints;
+
+  if (powerupsRemoved > 0) {
+    for (let i = 0; i < ghosts.length; i++) {
+      ghosts[i].scaredTimer = settings.fps * settings.ghostScaredTime;
+    }
+  }
 }
 
 function handleGameOver() {
