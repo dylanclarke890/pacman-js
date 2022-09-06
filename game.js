@@ -607,14 +607,14 @@ function handleGameOver() {
   ctx.font = "30px sans-serif";
   ctx.textAlign = "center";
   ctx.fillStyle = "white";
-  ctx.fillText(`GAME OVER`, canvas.width / 2, canvas.width / 2);
+  ctx.fillText(`GAME OVER`, canvas.width / 2, canvas.height / 2);
 }
 
 function handleGameWin() {
   ctx.font = "30px sans-serif";
   ctx.textAlign = "center";
   ctx.fillStyle = "white";
-  ctx.fillText(`YOU WIN`, canvas.width / 2, canvas.width / 2);
+  ctx.fillText(`YOU WIN`, canvas.width / 2, canvas.height / 2);
 }
 
 function update() {
