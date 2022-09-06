@@ -27,6 +27,7 @@ const settings = {
   ghostSpeed: 2,
   pelletR: 3,
   pelletPoints: 10,
+  powerupR: 5,
   offset: 3,
   topbarOffset: 40,
 };
@@ -300,9 +301,30 @@ class Pellet {
   }
 }
 
+class Powerup {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.r = settings.powerupR;
+    this.collected = false;
+  }
+
+  draw() {
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  update() {
+    if (circlesAreColliding(this, player)) this.collected = true;
+  }
+}
+
 const map = [
   ["1", "-", "-", "-", "-", "-", "-", "-", "-", "-", "2"],
-  ["|", ".", ".", ".", "R", "G", "B", ".", ".", ".", "|"],
+  ["|", "o", ".", ".", "R", "G", "B", ".", ".", "o", "|"],
   ["|", ".", "b", ".", "[", "7", "]", ".", "b", ".", "|"],
   ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
   ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
@@ -312,12 +334,13 @@ const map = [
   ["|", ".", "[", "]", ".", "P", ".", "[", "]", ".", "|"],
   ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
   ["|", ".", "b", ".", "[", "5", "]", ".", "b", ".", "|"],
-  ["|", ".", ".", ".", ".", ".", ".", ".", ".", ".", "|"],
+  ["|", "o", ".", ".", ".", ".", ".", ".", ".", "o", "|"],
   ["3", "-", "-", "-", "-", "-", "-", "-", "-", "-", "4"],
 ];
 
 let boundaries = [];
 let pellets = [];
+let powerups = [];
 let ghosts = [];
 let score = 0;
 let winState = 0;
@@ -423,6 +446,9 @@ function newImage(src) {
         case ".":
           pellets.push(new Pellet(x + cellSize / 2, y + cellSize / 2));
           break;
+        case "o":
+          powerups.push(new Powerup(x + cellSize / 2, y + cellSize / 2));
+          break;
         case "P":
           player = new Player(x + cellSize / 2, y + cellSize / 2);
           break;
@@ -450,16 +476,25 @@ function handleGameLoop() {
     pellets[i].draw();
     pellets[i].update();
   }
+  for (let i = 0; i < powerups.length; i++) {
+    powerups[i].draw();
+    powerups[i].update();
+  }
   for (let i = 0; i < ghosts.length; i++) {
     ghosts[i].draw();
     ghosts[i].update();
   }
   player.draw();
   player.update();
-  const origLength = pellets.length;
+  const oP = pellets.length;
+  const oPU = powerups.length;
   pellets = pellets.filter((p) => !p.collected);
-  const pelletsRemoved = origLength - pellets.length;
+  powerups = powerups.filter((p) => !p.collected);
+
+  const pelletsRemoved = oP - pellets.length;
+  const powerupsRemoved = oPU - powerups.length;
   score += pelletsRemoved * settings.pelletPoints;
+  score += powerupsRemoved * settings.powerupPoints;
 }
 
 function handleGameOver() {
