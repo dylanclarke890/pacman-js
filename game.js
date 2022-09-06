@@ -26,8 +26,9 @@ const settings = {
   pacmanMouthStep: 0.25,
   pacmanMaxMouth: 0.75,
   pacmanMouthInterval: 0.1, // in seconds
+  offset: 3,
   ghostR: 15,
-  ghostSpeed: 2,
+  ghostSpeed: 3,
   ghostPoints: 100,
   ghostScaredColor: "blue",
   ghostFlashColor: "grey",
@@ -38,16 +39,15 @@ const settings = {
   pelletPoints: 10,
   powerupR: 5,
   powerupPoints: 50,
-  offset: 3,
   topbarOffset: 40,
 };
 
-function isCircleRectCollision(c, r) {
+function isCircleRectCollision(c, r, offset = settings.offset) {
   return (
-    c.y - c.r + c.velocity.y - settings.offset <= r.y + r.h &&
-    c.x + c.r + c.velocity.x + settings.offset >= r.x &&
-    c.y + c.r + c.velocity.y + settings.offset >= r.y &&
-    c.x - c.r + c.velocity.x - settings.offset <= r.x + r.w
+    c.y - c.r + c.velocity.y - offset <= r.y + r.h &&
+    c.x + c.r + c.velocity.x + offset >= r.x &&
+    c.y + c.r + c.velocity.y + offset >= r.y &&
+    c.x - c.r + c.velocity.x - offset <= r.x + r.w
   );
 }
 
@@ -213,6 +213,14 @@ class Player {
       }
     }
 
+    if (this.x + this.r < 0) {
+      this.x = canvas.width + this.r;
+      this.velocity.x = -Player.speed;
+    } else if (this.x > canvas.width + this.r) {
+      this.x = 0 - this.r;
+      this.velocity.x = Player.speed;
+    }
+
     if (player.velocity.x > 0) player.rotation = 0;
     else if (player.velocity.x < 0) player.rotation = Math.PI;
     else if (player.velocity.y > 0) player.rotation = Math.PI / 2;
@@ -224,7 +232,8 @@ class Player {
       if (
         isCircleRectCollision(
           { ...this, velocity: { x: xv, y: yv } },
-          boundaries[i]
+          boundaries[i],
+          Player.speed
         )
       )
         return true;
@@ -280,7 +289,8 @@ class Ghost {
         !collisions.includes("l") &&
         isCircleRectCollision(
           { ...this, velocity: { x: -Ghost.speed, y: 0 } },
-          boundaries[i]
+          boundaries[i],
+          Ghost.speed
         )
       )
         collisions.push("l");
@@ -288,7 +298,8 @@ class Ghost {
         !collisions.includes("r") &&
         isCircleRectCollision(
           { ...this, velocity: { x: Ghost.speed, y: 0 } },
-          boundaries[i]
+          boundaries[i],
+          Ghost.speed
         )
       )
         collisions.push("r");
@@ -296,7 +307,8 @@ class Ghost {
         !collisions.includes("u") &&
         isCircleRectCollision(
           { ...this, velocity: { x: 0, y: -Ghost.speed } },
-          boundaries[i]
+          boundaries[i],
+          Ghost.speed
         )
       )
         collisions.push("u");
@@ -304,7 +316,8 @@ class Ghost {
         !collisions.includes("d") &&
         isCircleRectCollision(
           { ...this, velocity: { x: 0, y: Ghost.speed } },
-          boundaries[i]
+          boundaries[i],
+          Ghost.speed
         )
       )
         collisions.push("d");
@@ -349,6 +362,13 @@ class Ghost {
 
     this.x += this.velocity.x;
     this.y += this.velocity.y;
+    if (this.x + this.r < 0) {
+      this.x = canvas.width + this.r;
+      this.velocity.x = -Ghost.speed;
+    } else if (this.x > canvas.width + this.r) {
+      this.x = 0 - this.r;
+      this.velocity.x = Ghost.speed;
+    }
   }
 }
 
@@ -400,9 +420,9 @@ const map = [
   ["|", ".", "b", ".", "[", "7", "]", ".", "b", ".", "|"],
   ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
   ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
-  ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
-  ["|", ".", "b", ".", "[", "+", "]", ".", "b", ".", "|"],
-  ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
+  ["_", ".", ".", ".", ".", "^", ".", ".", ".", ".", "_"],
+  [" ", ".", "b", ".", "[", "+", "]", ".", "b", ".", " "],
+  ["^", ".", ".", ".", ".", "_", ".", ".", ".", ".", "^"],
   ["|", ".", "[", "]", ".", "P", ".", "[", "]", ".", "|"],
   ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
   ["|", ".", "b", ".", "[", "5", "]", ".", "b", ".", "|"],
