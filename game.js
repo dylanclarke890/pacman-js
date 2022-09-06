@@ -16,6 +16,25 @@ const pressed = {
   last: "",
 };
 
+const FPS = 60;
+const settings = {
+  fps: FPS,
+  fpsInterval: 1000 / FPS,
+  cellSize: 40,
+  pacmanR: 15,
+  pacmanSpeed: 3,
+  borderOffset: 3,
+};
+
+function isCircleRectCollision(c, r) {
+  return (
+    c.y - c.r + c.velocity.y - settings.borderOffset <= r.y + r.h &&
+    c.x + c.r + c.velocity.x + settings.borderOffset >= r.x &&
+    c.y + c.r + c.velocity.y + settings.borderOffset >= r.y &&
+    c.x - c.r + c.velocity.x - settings.borderOffset <= r.x + r.w
+  );
+}
+
 window.addEventListener("keydown", (e) => {
   switch (e.code) {
     case "ArrowUp":
@@ -55,15 +74,6 @@ window.addEventListener("keyup", (e) => {
   }
 });
 
-const FPS = 60;
-const settings = {
-  fps: FPS,
-  fpsInterval: 1000 / FPS,
-  cellSize: 40,
-  pacmanR: 15,
-  pacmanSpeed: 3,
-};
-
 class Boundary {
   constructor(x, y) {
     this.x = x;
@@ -96,65 +106,79 @@ class Player {
   }
 
   update() {
+    console.log({ x: this.x });
     switch (pressed.last) {
       case pressed.right.key:
-        this.velocity.x = Player.speed;
-        this.velocity.y = 0;
+        if (this.willCollideWithABoundary(Player.speed, 0)) {
+          this.velocity.x = 0;
+        } else {
+          this.velocity.x = Player.speed;
+          this.velocity.y = 0;
+        }
         break;
       case pressed.left.key:
-        this.velocity.x = -Player.speed;
-        this.velocity.y = 0;
+        if (this.willCollideWithABoundary(-Player.speed, 0)) {
+          this.velocity.x = 0;
+        } else {
+          this.velocity.x = -Player.speed;
+          this.velocity.y = 0;
+        }
         break;
       case pressed.down.key:
-        this.velocity.x = 0;
-        this.velocity.y = Player.speed;
+        if (this.willCollideWithABoundary(0, Player.speed)) {
+          this.velocity.y = 0;
+        } else {
+          this.velocity.x = 0;
+          this.velocity.y = Player.speed;
+        }
         break;
       case pressed.up.key:
-        this.velocity.x = 0;
-        this.velocity.y = -Player.speed;
+        if (this.willCollideWithABoundary(0, -Player.speed)) {
+          this.velocity.y = 0;
+        } else {
+          this.velocity.x = 0;
+          this.velocity.y = -Player.speed;
+        }
         break;
       default:
         break;
     }
 
-    for (let i = 0; i < boundaries.length; i++) {
-      const bound = boundaries[i];
-      if (
-        this.y - this.r <= bound.y + bound.h &&
-        this.x + this.r >= bound.x &&
-        this.y + this.r >= bound.y &&
-        this.x - this.r <= bound.x + bound.w
-      ) {
-        if (this.velocity.x > 0) this.x -= Player.speed;
-        else if (this.velocity.x < 0) this.x += Player.speed;
-        if (this.velocity.y > 0) this.y -= Player.speed;
-        else if (this.velocity.y < 0) this.y += Player.speed;
-
-        this.velocity.x = 0;
-        this.velocity.y = 0;
-        pressed.last = "";
-        break;
-      }
+    if (this.willCollideWithABoundary(this.velocity.x, this.velocity.y)) {
+      this.velocity.x = 0;
+      this.velocity.y = 0;
     }
 
     this.x += this.velocity.x;
     this.y += this.velocity.y;
   }
+
+  willCollideWithABoundary(xv, yv) {
+    for (let i = 0; i < boundaries.length; i++)
+      if (
+        isCircleRectCollision(
+          { ...this, velocity: { x: xv, y: yv } },
+          boundaries[i]
+        )
+      )
+        return true;
+    return false;
+  }
 }
 
 const map = [
-  ["-", "-", "-", "-", "-", "-"],
-  ["-", " ", " ", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", "-"],
-  ["-", " ", "-", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", "-"],
-  ["-", " ", " ", " ", " ", "-"],
-  ["-", "-", "-", "-", "-", "-"],
+  ["-", "-", "-", "-", "-", "-", "-"],
+  ["-", " ", " ", " ", " ", " ", "-"],
+  ["-", " ", "-", " ", "-", " ", "-"],
+  ["-", " ", " ", " ", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", " ", "-"],
+  ["-", " ", "-", " ", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", " ", "-"],
+  ["-", " ", " ", " ", " ", " ", "-"],
+  ["-", "-", "-", "-", "-", "-", "-"],
 ];
 
 const boundaries = [];
