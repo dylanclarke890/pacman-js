@@ -23,6 +23,9 @@ const settings = {
   cellSize: 40,
   pacmanR: 15,
   pacmanSpeed: 4,
+  pacmanMouthStep: 0.25,
+  pacmanMaxMouth: 0.75,
+  pacmanMouthInterval: 0.1, // in seconds
   ghostR: 15,
   ghostSpeed: 2,
   ghostPoints: 100,
@@ -109,17 +112,30 @@ class Player {
     this.y = y;
     this.velocity = { x: 0, y: 0 };
     this.r = settings.pacmanR;
+    this.radians = 0.5;
+    this.mouthTimer = Math.floor(settings.fps * settings.pacmanMouthInterval);
+    this.opening = false;
+    this.rotation = 0;
   }
 
   draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    ctx.translate(-this.x, -this.y);
     ctx.fillStyle = "yellow";
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.arc(this.x, this.y, this.r, this.radians, Math.PI * 2 - this.radians);
+    ctx.lineTo(this.x, this.y);
     ctx.fill();
     ctx.closePath();
+    ctx.restore();
   }
 
   update() {
+    const { fps, pacmanMaxMouth, pacmanMouthInterval, pacmanMouthStep } =
+      settings;
+
     for (let i = 0; i < ghosts.length; i++) {
       const ghost = ghosts[i];
       if (circlesAreColliding(this, ghost)) {
@@ -176,6 +192,28 @@ class Player {
 
     this.x += this.velocity.x;
     this.y += this.velocity.y;
+
+    if (this.mouthTimer > 0) {
+      this.mouthTimer--;
+      if (this.mouthTimer === 0) {
+        if (!(this.velocity.x === 0 && this.velocity.y === 0)) {
+          if (this.radians < pacmanMaxMouth && this.opening) {
+            this.radians += pacmanMouthStep;
+            if (this.radians === pacmanMaxMouth) this.opening = false;
+          }
+          if (this.radians > 0 && !this.opening) {
+            this.radians -= pacmanMouthStep;
+            if (this.radians === 0) this.opening = true;
+          }
+        }
+        this.mouthTimer = Math.floor(fps * pacmanMouthInterval);
+      }
+    }
+
+    if (player.velocity.x > 0) player.rotation = 0;
+    else if (player.velocity.x < 0) player.rotation = Math.PI;
+    else if (player.velocity.y > 0) player.rotation = Math.PI / 2;
+    else if (player.velocity.y < 0) player.rotation = Math.PI * 1.5;
   }
 
   willCollideWithABoundary(xv, yv) {
