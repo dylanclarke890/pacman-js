@@ -23,6 +23,8 @@ const settings = {
   cellSize: 40,
   pacmanR: 15,
   pacmanSpeed: 3,
+  ghostR: 15,
+  ghostSpeed: 3,
   pelletR: 3,
   pelletPoints: 10,
   offset: 3,
@@ -172,6 +174,47 @@ class Player {
   }
 }
 
+class Ghost {
+  static speed = settings.ghostSpeed;
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    this.velocity = { x: 0, y: 0 };
+    this.r = settings.ghostR;
+    this.color = color;
+  }
+
+  draw() {
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  update() {
+    if (this.willCollideWithABoundary(this.velocity.x, this.velocity.y)) {
+      this.velocity.x = 0;
+      this.velocity.y = 0;
+    }
+
+    this.x += this.velocity.x;
+    this.y += this.velocity.y;
+  }
+
+  willCollideWithABoundary(xv, yv) {
+    for (let i = 0; i < boundaries.length; i++)
+      if (
+        isCircleRectCollision(
+          { ...this, velocity: { x: xv, y: yv } },
+          boundaries[i]
+        )
+      )
+        return true;
+    return false;
+  }
+}
+
 class Pellet {
   constructor(x, y) {
     this.x = x;
@@ -195,7 +238,7 @@ class Pellet {
 
 const map = [
   ["1", "-", "-", "-", "-", "-", "-", "-", "-", "-", "2"],
-  ["|", ".", ".", ".", ".", ".", ".", ".", ".", ".", "|"],
+  ["|", ".", ".", ".", "R", "G", "B", ".", ".", ".", "|"],
   ["|", ".", "b", ".", "[", "7", "]", ".", "b", ".", "|"],
   ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
   ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
@@ -211,6 +254,7 @@ const map = [
 
 let boundaries = [];
 let pellets = [];
+let ghosts = [];
 let score = 0;
 let player;
 
@@ -317,6 +361,15 @@ function newImage(src) {
         case "P":
           player = new Player(x + cellSize / 2, y + cellSize / 2);
           break;
+        case "R":
+          ghosts.push(new Ghost(x + cellSize / 2, y + cellSize / 2, "red"));
+          break;
+        case "G":
+          ghosts.push(new Ghost(x + cellSize / 2, y + cellSize / 2, "green"));
+          break;
+        case "B":
+          ghosts.push(new Ghost(x + cellSize / 2, y + cellSize / 2, "blue"));
+          break;
         default:
           break;
       }
@@ -332,6 +385,10 @@ function update() {
   for (let i = 0; i < pellets.length; i++) {
     pellets[i].draw();
     pellets[i].update();
+  }
+  for (let i = 0; i < ghosts.length; i++) {
+    ghosts[i].draw();
+    ghosts[i].update();
   }
   player.draw();
   player.update();
