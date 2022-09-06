@@ -6,7 +6,7 @@ function new2dCanvas(id, width, height) {
   return [canvas, ctx];
 }
 
-const [canvas, ctx] = new2dCanvas("play-area", 800, 480);
+const [canvas, ctx] = new2dCanvas("play-area", 800, 520);
 
 const pressed = {
   up: { key: "ArrowUp", is: false },
@@ -167,18 +167,19 @@ class Player {
 }
 
 const map = [
-  ["-", "-", "-", "-", "-", "-", "-"],
-  ["|", " ", " ", " ", " ", " ", "|"],
-  ["|", " ", "-", " ", "-", " ", "|"],
-  ["|", " ", " ", " ", " ", " ", "|"],
-  ["|", " ", " ", " ", " ", " ", "|"],
-  ["|", " ", "-", " ", " ", " ", "|"],
-  ["|", " ", " ", " ", " ", " ", "|"],
-  ["|", " ", " ", " ", " ", " ", "|"],
-  ["|", " ", " ", " ", " ", " ", "|"],
-  ["|", " ", " ", " ", " ", " ", "|"],
-  ["|", " ", " ", " ", " ", " ", "|"],
-  ["-", "-", "-", "-", "-", "-", "-"],
+  ["1", "-", "-", "-", "-", "-", "-", "-", "-", "-", "2"],
+  ["|", ".", ".", ".", ".", ".", ".", ".", ".", ".", "|"],
+  ["|", ".", "b", ".", "[", "7", "]", ".", "b", ".", "|"],
+  ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
+  ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
+  ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
+  ["|", ".", "b", ".", "[", "+", "]", ".", "b", ".", "|"],
+  ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
+  ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
+  ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
+  ["|", ".", "b", ".", "[", "5", "]", ".", "b", ".", "|"],
+  ["|", ".", ".", ".", ".", ".", ".", ".", ".", "p", "|"],
+  ["3", "-", "-", "-", "-", "-", "-", "-", "-", "-", "4"],
 ];
 
 const boundaries = [];
@@ -232,6 +233,61 @@ function newImage(src) {
           break;
         case "|":
           boundaries.push(new Boundary(x, y, newImage(assets.pipe.vertical)));
+          break;
+        case "1":
+          boundaries.push(new Boundary(x, y, newImage(assets.pipe.topLeft)));
+          break;
+        case "2":
+          boundaries.push(new Boundary(x, y, newImage(assets.pipe.topRight)));
+          break;
+        case "3":
+          boundaries.push(new Boundary(x, y, newImage(assets.pipe.bottomLeft)));
+          break;
+        case "4":
+          boundaries.push(
+            new Boundary(x, y, newImage(assets.pipe.bottomRight))
+          );
+          break;
+        case "b":
+          boundaries.push(new Boundary(x, y, newImage(assets.block)));
+          break;
+        case "[":
+          boundaries.push(new Boundary(x, y, newImage(assets.cap.left)));
+          break;
+        case "]":
+          boundaries.push(new Boundary(x, y, newImage(assets.cap.right)));
+          break;
+        case "_":
+          boundaries.push(new Boundary(x, y, newImage(assets.cap.bottom)));
+          break;
+        case "^":
+          boundaries.push(new Boundary(x, y, newImage(assets.cap.top)));
+          break;
+        case "+":
+          boundaries.push(new Boundary(x, y, newImage(assets.pipe.cross)));
+          break;
+        case "5":
+          boundaries.push(
+            new Boundary(x, y, newImage(assets.pipeConnector.top))
+          );
+          break;
+        case "6":
+          boundaries.push(
+            new Boundary(x, y, newImage(assets.pipeConnector.right))
+          );
+          break;
+        case "7":
+          boundaries.push(
+            new Boundary(x, y, newImage(assets.pipeConnector.bottom))
+          );
+          break;
+        case "8":
+          boundaries.push(
+            new Boundary(x, y, newImage(assets.pipeConnector.left))
+          );
+          break;
+        case ".":
+          // pellets
           break;
         default:
           break;
