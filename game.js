@@ -523,6 +523,8 @@ function handleGameLoop() {
       ghosts[i].scaredTimer = settings.fps * settings.ghostScaredTime;
     }
   }
+
+  if (powerups.length === 0 && pellets.length === 0) winState = 1;
 }
 
 function handleGameOver() {
@@ -532,11 +534,15 @@ function handleGameOver() {
   ctx.fillText(`GAME OVER`, canvas.width / 2, canvas.width / 2);
 }
 
-function handleGameWin() {}
+function handleGameWin() {
+  ctx.font = "30px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "white";
+  ctx.fillText(`YOU WIN`, canvas.width / 2, canvas.width / 2);
+}
 
 function update() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   switch (winState) {
     case 1:
       handleGameWin();
