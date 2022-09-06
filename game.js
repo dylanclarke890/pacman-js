@@ -30,7 +30,10 @@ const settings = {
   ghostSpeed: 2,
   ghostPoints: 100,
   ghostScaredColor: "blue",
-  ghostScaredTime: 3, // in seconds
+  ghostFlashColor: "grey",
+  ghostScaredTime: 5, // in seconds
+  ghostScaredFlashInterval: 0.25, // in seconds
+  ghostScaredFlashBelow: 2, // in seconds
   pelletR: 3,
   pelletPoints: 10,
   powerupR: 5,
@@ -241,10 +244,25 @@ class Ghost {
     this.prevCollisions = [];
     this.scaredTimer = 0;
     this.eaten = false;
+    this.blink = false;
   }
 
   draw() {
-    ctx.fillStyle = this.scaredTimer > 0 ? Ghost.scaredColor : this.color;
+    const {
+      fps,
+      ghostScaredFlashBelow,
+      ghostScaredFlashInterval,
+      ghostFlashColor,
+      ghostScaredColor,
+    } = settings;
+
+    if (this.scaredTimer > 0) {
+      if (this.scaredTimer < fps * ghostScaredFlashBelow) {
+        if (this.scaredTimer % (fps * ghostScaredFlashInterval) === 0)
+          this.blink = !this.blink;
+        ctx.fillStyle = this.blink ? ghostFlashColor : ghostScaredColor;
+      } else ctx.fillStyle = ghostScaredColor;
+    } else ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
     ctx.fill();
