@@ -23,6 +23,7 @@ const settings = {
   cellSize: 40,
   pacmanR: 15,
   pacmanSpeed: 3,
+  pelletR: 3,
   borderOffset: 3,
 };
 
@@ -166,6 +167,22 @@ class Player {
   }
 }
 
+class Pellet {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.r = settings.pelletR;
+  }
+
+  draw() {
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.closePath();
+  }
+}
+
 const map = [
   ["1", "-", "-", "-", "-", "-", "-", "-", "-", "-", "2"],
   ["|", ".", ".", ".", ".", ".", ".", ".", ".", ".", "|"],
@@ -178,11 +195,12 @@ const map = [
   ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
   ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
   ["|", ".", "b", ".", "[", "5", "]", ".", "b", ".", "|"],
-  ["|", ".", ".", ".", ".", ".", ".", ".", ".", "p", "|"],
+  ["|", ".", ".", ".", ".", ".", ".", ".", ".", ".", "|"],
   ["3", "-", "-", "-", "-", "-", "-", "-", "-", "-", "4"],
 ];
 
 const boundaries = [];
+const pellets = [];
 const player = new Player(
   settings.cellSize + settings.cellSize / 2,
   settings.cellSize + settings.cellSize / 2,
@@ -287,7 +305,7 @@ function newImage(src) {
           );
           break;
         case ".":
-          // pellets
+          pellets.push(new Pellet(x + cellSize / 2, y + cellSize / 2));
           break;
         default:
           break;
@@ -300,6 +318,9 @@ function update() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (let i = 0; i < boundaries.length; i++) {
     boundaries[i].draw();
+  }
+  for (let i = 0; i < pellets.length; i++) {
+    pellets[i].draw();
   }
   player.draw();
   player.update();
