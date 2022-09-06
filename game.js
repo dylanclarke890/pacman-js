@@ -202,21 +202,17 @@ const map = [
   ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
   ["|", ".", "b", ".", "[", "+", "]", ".", "b", ".", "|"],
   ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
-  ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
+  ["|", ".", "[", "]", ".", "P", ".", "[", "]", ".", "|"],
   ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
   ["|", ".", "b", ".", "[", "5", "]", ".", "b", ".", "|"],
   ["|", ".", ".", ".", ".", ".", ".", ".", ".", ".", "|"],
   ["3", "-", "-", "-", "-", "-", "-", "-", "-", "-", "4"],
 ];
 
-const boundaries = [];
+let boundaries = [];
 let pellets = [];
 let score = 0;
-const player = new Player(
-  settings.cellSize + settings.cellSize / 2,
-  settings.cellSize + settings.topbarOffset + settings.cellSize / 2,
-  { x: 0, y: 0 }
-);
+let player;
 
 const assets = {
   block: "./assets/block.png",
@@ -317,6 +313,9 @@ function newImage(src) {
           break;
         case ".":
           pellets.push(new Pellet(x + cellSize / 2, y + cellSize / 2));
+          break;
+        case "P":
+          player = new Player(x + cellSize / 2, y + cellSize / 2);
           break;
         default:
           break;
